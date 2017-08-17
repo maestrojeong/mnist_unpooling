@@ -38,17 +38,7 @@ def extend(tensor, hr = 2, wr = 2):
         tensor - NHWC(batch, height*hr, width*wr, channel)
     '''
     batch, height, width, channel = get_shape(tensor)
-    index_matrix = np.zeros((batch, hr*height, wr*width, channel, 4), dtype = np.int32)
-    for b in range(batch):
-        for h in range(hr*height):
-            for w in range(wr*width):
-                for c in range(channel):
-                    index_matrix[b][h][w][c][0] = b
-                    index_matrix[b][h][w][c][1] = int(h/hr)
-                    index_matrix[b][h][w][c][2] = int(w/wr)
-                    index_matrix[b][h][w][c][3] = c
-    return tf.gather_nd(tensor, index_matrix)
-
+    return tf.reshape(tf.tile(tf.reshape(tensor, [-1, height, 1, width, 1, channel]), [1,1,hr,1,wr,1]), [-1, height*hr, width*wr, channel])
 
 def print_vars(string):
     '''print variables in collection named string'''
